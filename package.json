@@ -2,7 +2,12 @@
   "private": true,
   "name": "markdown-trapahi",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "bootstrap": "lerna bootstrap",
+    "build": "NODE_ENV=production lerna run build",
+    "flow": "lerna run flow",
+    "lint": "lerna run lint --cache --fix .",
+    "test": "npm run test:packages",
+    "test:packages": "NODE_ENV=test lerna run test"
   },
   "author": {
     "name": "tett23",
@@ -32,6 +37,7 @@
     "flow-runtime": "^0.17.0",
     "flow-typed": "^2.4.0",
     "jest": "^22.2.2",
+    "lerna": "^2.11.0",
     "prettier": "^1.13.4"
   }
 }
