@@ -1,0 +1,17 @@
+{
+  "presets": [
+    ["env", {
+      "targets": { "node": 8 },
+      "useBuiltIns": true
+    }],
+    "stage-0",
+    "flow"
+  ],
+  "plugins": [],
+  "env": {
+    "production": {
+    },
+    "development": {
+    }
+  }
+}
