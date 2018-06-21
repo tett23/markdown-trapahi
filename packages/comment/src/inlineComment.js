@@ -10,10 +10,10 @@ type Options = {
 
 const commentRegExp = /#\[(.+?)\]/;
 
-export default function comment(options: Options = {}) {
+export default function attacher(options: Options = {}) {
   const { Parser, Compiler } = this;
   const env = options.env || process.env.NODE_ENV || 'production';
-  const className = options.className || null;
+  const className = options.className || 'galley-comment galley-comment-inline';
 
   Parser.prototype.inlineTokenizers.inlineComment = inlineTokenizer;
   Parser.prototype.inlineMethods.splice(Parser.prototype.inlineMethods.indexOf('autoLink'), 0, 'inlineComment');
@@ -31,6 +31,20 @@ export default function comment(options: Options = {}) {
   return transformer;
 
   function transformer(tree: Node, file: VFile, next: NextFunction) {
+    tree.children.reverse().forEach((node: Node, i: number) => {
+      if (node.children.length >= 1) {
+        return;
+      }
+
+      if (node.type !== 'paragraph') {
+        return;
+      }
+
+      tree.children.splice(i, 1);
+    });
+
+    tree.children.reverse();
+
     next(null, tree, file);
   }
 

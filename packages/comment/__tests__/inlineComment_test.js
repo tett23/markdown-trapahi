@@ -5,14 +5,14 @@ import unified from 'unified';
 import markdown from 'remark-parse';
 import remark2rehype from 'remark-rehype';
 import stringify from 'rehype-stringify';
-import parser from '../src/inlineComment';
+import inlineComment from '../src/inlineComment';
 
 jest.setTimeout(500);
 
-async function parse(text: string): Object {
+async function parse(text: string, options: Object = {}): Object {
   const processor = unified()
     .use(markdown)
-    .use(parser)
+    .use(inlineComment, options)
     .use(remark2rehype)
     .use(stringify);
 
@@ -21,16 +21,28 @@ async function parse(text: string): Object {
   return ret;
 }
 
-describe('inlineComment parser', () => {
-  it('hoge', async () => {
-    const ast = await parse('hoge');
+describe('blockComment', () => {
+  it('should return span', async () => {
+    const ast = await parse(`#[comment text]`);
 
-    expect(ast.contents).toBe('<p>hoge</p>');
+    expect(ast.contents).toBe('<p><span class="galley-comment galley-comment-inline">comment text</span></p>');
   });
 
-  it('#[comment]', async () => {
-    const ast = await parse('#[comment]');
+  it('when environment is "production" should remove inline comment', async () => {
+    const ast = await parse(`#[comment text]text`, { env: 'production' });
 
-    expect(ast.contents).toBe('<p><span>comment</span></p>');
+    expect(ast.contents).toBe('<p>text</p>');
+  });
+
+  it('if children is empty when after tokenizer processed should remove inline comment', async () => {
+    const ast = await parse(`#[comment text]`, { env: 'production' });
+
+    expect(ast.contents).toBe('');
+  });
+
+  it('when pass className option should attach class attribute to span', async () => {
+    const ast = await parse(`#[comment text]`, { className: 'test-class' });
+
+    expect(ast.contents).toBe('<p><span class="test-class">comment text</span></p>');
   });
 });
