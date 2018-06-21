@@ -9,10 +9,10 @@ import parser from '../src/blockComment.js';
 
 jest.setTimeout(500);
 
-async function parse(text: string): Object {
+async function parse(text: string, options: Object = {}): Object {
   const processor = unified()
     .use(markdown)
-    .use(parser)
+    .use(parser, options)
     .use(remark2rehype)
     .use(stringify);
 
@@ -21,15 +21,60 @@ async function parse(text: string): Object {
   return ret;
 }
 
-describe('blockComment parser', () => {
-  it('hoge', async () => {
+describe('blockComment', () => {
+  it('should transform to paragraph from code fence', async () => {
     const text = `
 \`\`\` comment
-comment
+comment text
 \`\`\`
     `;
     const ast = await parse(text);
 
-    expect(ast.contents).toBe('<p class="galley-comment galley-comment-block">comment</p>');
+    expect(ast.contents).toBe('<p class="galley-comment galley-comment-block">comment text</p>');
+  });
+
+  it('should replace \\n to mdast break', async () => {
+    const text = `
+\`\`\` comment
+line1
+line2
+\`\`\`
+    `;
+    const ast = await parse(text);
+
+    expect(ast.contents).toBe('<p class="galley-comment galley-comment-block">line1<br>\nline2</p>');
+  });
+
+  it('when environment is "production" should remove fenced comment', async () => {
+    const text = `
+\`\`\` comment
+comment text
+\`\`\`
+    `;
+    const ast = await parse(text, { env: 'production' });
+
+    expect(ast.contents).toBe('');
+  });
+
+  it('when pass className option should attach class attribute to paragraph', async () => {
+    const text = `
+\`\`\` comment
+comment text
+\`\`\`
+    `;
+    const ast = await parse(text, { className: 'test-class' });
+
+    expect(ast.contents).toBe('<p class="test-class">comment text</p>');
+  });
+
+  it('when lang is not comment, attacher should nothing to do', async () => {
+    const text = `
+\`\`\` comment
+comment text
+\`\`\`
+    `;
+    const ast = await parse(text, { className: 'test-class' });
+
+    expect(ast.contents).toBe('<p class="test-class">comment text</p>');
   });
 });
