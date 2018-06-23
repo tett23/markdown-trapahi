@@ -4,9 +4,8 @@
   "description": "",
   "main": "lib/index.js",
   "scripts": {
-    "build": "NODE_ENV=production npm run babel src --out-dir lib --copy-files",
+    "build": "NODE_ENV=production tsc -p .",
     "prepublish": "npm run --if-present build",
-    "flow": "flow",
     "lint": "eslint --cache --fix .",
     "test": "NODE_ENV=test jest"
   },
@@ -14,47 +13,59 @@
     "name": "tett23",
     "email": "tett23@gmail.com"
   },
-  "license": "ISC",
+  "license": "MIT",
   "jest": {
     "moduleFileExtensions": [
+      "ts",
+      "tsx",
       "js"
     ],
-    "moduleDirectories": [
-      "node_modules",
-      "../../node_modules"
-    ],
     "transform": {
-      "^.+\\.js$": "babel-jest"
-    }
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfigFile": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/__tests__/*.+(ts|tsx|js)"
+    ],
+    "testPathIgnorePatterns": [
+      "node_modules",
+      "\\.d\\.ts",
+      "lib"
+    ]
   },
   "devDependencies": {
+    "@types/jest": "^23.1.1",
+    "@types/node": "^10.3.5",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.1",
     "babel-jest": "^22.2.2",
-    "babel-plugin-flow-runtime": "^0.17.0",
     "babel-preset-env": "^1.5.1",
-    "babel-preset-flow": "^6.23.0",
-    "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.24.1",
     "eslint": "^4.17.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-formatter-pretty": "^1.1.0",
-    "eslint-plugin-compat": "^2.2.0",
-    "eslint-plugin-flowtype": "^2.49.3",
-    "eslint-plugin-flowtype-errors": "^3.3.7",
-    "eslint-plugin-import": "^2.8.0",
+    "eslint-import-resolver-node": "^0.3.2",
+    "eslint-plugin-compat": "^2.4.0",
     "eslint-plugin-jest": "^21.8.0",
     "eslint-plugin-prettier": "^2.6.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "flow-bin": "^0.72.0",
-    "flow-runtime": "^0.17.0",
-    "flow-typed": "^2.4.0",
+    "eslint-plugin-typescript": "^0.12.0",
     "jest": "^23.1.0",
     "rehype-stringify": "^3.0.0",
     "remark": "^9.0.0",
+    "remark-html": "^7.0.0",
     "remark-parse": "^5.0.0",
     "remark-rehype": "^3.0.0",
+    "remark-stringify": "^5.0.0",
     "remark-vdom": "^5.0.0",
+    "ts-jest": "^22.4.6",
+    "ts-node": "^7.0.0",
+    "ts-node-test-register": "^4.0.0",
+    "typescript": "^2.9.2",
+    "typescript-eslint-parser": "^16.0.0",
     "unified": "^7.0.0"
   }
 }
