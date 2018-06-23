@@ -1,16 +1,13 @@
-// @flow
+interface Options {
+  readonly env: string;
+  readonly visitor: (node: Node, env: string) => string;
+  readonly className: string | null;
+}
 
-import type { Node, VFile, NextFunction } from 'unified';
+type PartialOptions = { [O in keyof Options]?: Options[O] };
 
-type Options = {
-  env?: string,
-  visitor?: (Node, ?string) => string,
-  className?: string,
-};
-
-export default function attacher(options: Options = {}) {
-  const env = options.env || process.env.NODE_ENV || 'production';
-  const className = options.className || 'galley-comment galley-comment-block';
+export default function attacher(_options: PartialOptions = {}) {
+  const options = { ...defaultOptions, ..._options };
 
   function transformer(tree: Node, _: VFile, next: NextFunction) {
     tree.children.reverse().forEach((node: Node, i: number) => {
