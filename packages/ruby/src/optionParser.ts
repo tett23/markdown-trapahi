@@ -37,6 +37,9 @@ function castValue(value: string | null): OptionValue {
     return true;
   }
 
+  if (value === 'null') {
+    return null;
+  }
   if (value === 'true') {
     return true;
   }
