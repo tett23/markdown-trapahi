@@ -11,7 +11,7 @@ export type PartialOptions = { [O in keyof Options]?: Options[O] };
 const commentRegExp = /#\[(.+?)\]/;
 const defaultOptions: Options = {
   env: process.env.NODE_ENV || 'production',
-  className: null,
+  className: 'galley-comment galley-comment-inline',
   visitor: visitor,
 };
 

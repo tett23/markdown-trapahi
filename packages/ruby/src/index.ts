@@ -1,13 +1,13 @@
 import optionParser from './optionParser';
 
-interface Options {
+export interface Options {
   readonly visitor: (node: Node, env: string) => string;
   readonly className: string | null;
   readonly rpBefore: string;
   readonly rpAfter: string;
 }
 
-type PartialOptions = { [O in keyof Options]?: Options[O] };
+export type PartialOptions = { [O in keyof Options]?: Options[O] };
 
 type Node = any;
 

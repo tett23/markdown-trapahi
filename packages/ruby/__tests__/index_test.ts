@@ -13,7 +13,7 @@ interface ParseResult {
   contents: string;
 }
 
-async function parse(processor, text: string, options: Object = {}): Promise<ParseResult> {
+async function parse(processor, text: string): Promise<ParseResult> {
   const ret = await processor.process(text);
 
   return ret;
@@ -21,6 +21,7 @@ async function parse(processor, text: string, options: Object = {}): Promise<Par
 
 describe('ruby', () => {
   describe('rehype', () => {
+    let options = {}
     const processor = unified()
       .use(markdown)
       .use(ruby, options)
@@ -35,19 +36,21 @@ describe('ruby', () => {
   });
 
   describe('remark', () => {
+    let options = {}
     const processor = unified()
       .use(markdown)
       .use(ruby, options)
       .use(html);
 
     it('should return <ruby />', async () => {
-      const ast = await parse(`[base text](ruby text){ruby}`);
+      const ast = await parse(processor, `[base text](ruby text){ruby}`);
 
       expect(ast.contents.trim()).toBe('<p><ruby>base text<rp>(</rp><rt>ruby text</rt><rp>)</rp></ruby></p>');
     });
   });
 
   describe('remark-stringify', () => {
+    let options = {}
     const processor = unified()
       .use(markdown)
       .use(remarkStringify)
