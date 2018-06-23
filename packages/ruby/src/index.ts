@@ -1,7 +1,6 @@
 import optionParser from './optionParser';
 
 interface Options {
-  readonly env: string;
   readonly visitor: (node: Node, env: string) => string;
   readonly className: string | null;
   readonly rpBefore: string;
@@ -14,7 +13,6 @@ type Node = any;
 
 const rubyRegExp = /\[(.+?)\]\((.+?)\)\{(.+?)\}/;
 const defaultOptions: Options = {
-  env: 'development',
   className: null,
   visitor: visitor,
   rpBefore: '(',
