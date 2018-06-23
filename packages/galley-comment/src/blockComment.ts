@@ -1,18 +1,24 @@
-interface Options {
+/// <reference path="types.d.ts" />
+
+export interface Options {
   readonly env: string;
-  readonly visitor: (node: Node, env: string) => string;
   readonly className: string | null;
 }
 
-type PartialOptions = { [O in keyof Options]?: Options[O] };
+export type PartialOptions = { [O in keyof Options]?: Options[O] };
+
+const defaultOptions: Options = {
+  env: process.env.NODE_ENV || 'production',
+  className: null,
+};
 
 export default function attacher(_options: PartialOptions = {}) {
   const options = { ...defaultOptions, ..._options };
+  const { env, className } = options;
 
-  function transformer(tree: Node, _: VFile, next: NextFunction) {
-    tree.children.reverse().forEach((node: Node, i: number) => {
-      const { lang } = node;
-      if (lang !== 'comment') {
+  function transformer(tree: ASTNode, _: any, next: NextFunction) {
+    tree.children.reverse().forEach((node: ASTNode, i: number) => {
+      if (node.lang !== 'comment') {
         return;
       }
 
@@ -21,16 +27,18 @@ export default function attacher(_options: PartialOptions = {}) {
         return;
       }
 
-      const galleyComments = node.value
+      const galleyComments: ASTNode[] = node.value
         .replace(/\r\n/, '\n')
         .split('\n')
-        .map((line: string) => {
-          return {
-            type: 'text',
-            value: line,
-          };
-        })
-        .reduce((acc, item) => {
+        .map(
+          (line: string): ASTNode => {
+            return {
+              type: 'text',
+              value: line,
+            };
+          },
+        )
+        .reduce((acc: ASTNode[], item: ASTNode): ASTNode[] => {
           return acc.concat(item, { type: 'break' });
         }, []);
       const astItem = {
@@ -38,7 +46,7 @@ export default function attacher(_options: PartialOptions = {}) {
         children: galleyComments.slice(0, galleyComments.length - 1),
         data: {
           hProperties: {
-            className: className ? className : null,
+            className: className,
           },
         },
       };

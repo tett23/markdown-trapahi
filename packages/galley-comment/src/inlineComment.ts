@@ -1,37 +1,39 @@
-// @flow
+/// <reference path="types.d.ts" />
 
-import type { VFile, Node, NextFunction } from 'unified';
+export interface Options {
+  readonly env: string;
+  readonly visitor: (node: ASTNode, env: string) => string;
+  readonly className: string | null;
+}
 
-type Options = {
-  env?: string,
-  visitor?: (Node, ?string) => string,
-  className?: string,
-};
+export type PartialOptions = { [O in keyof Options]?: Options[O] };
 
 const commentRegExp = /#\[(.+?)\]/;
+const defaultOptions: Options = {
+  env: process.env.NODE_ENV || 'production',
+  className: null,
+  visitor: visitor,
+};
 
-export default function attacher(options: Options = {}) {
+export default function attacher(_options: PartialOptions = {}) {
+  // @ts-ignore
   const { Parser, Compiler } = this;
-  const env = options.env || process.env.NODE_ENV || 'production';
-  const className = options.className || 'galley-comment galley-comment-inline';
+  const options = { ...defaultOptions, ..._options };
+  const { env, className, visitor } = options;
 
   Parser.prototype.inlineTokenizers.inlineComment = inlineTokenizer;
   Parser.prototype.inlineMethods.splice(Parser.prototype.inlineMethods.indexOf('autoLink'), 0, 'inlineComment');
+  // @ts-ignore
   inlineTokenizer.locator = locator;
 
   if (Compiler != null) {
-    const { visitors } = Compiler.prototype;
-    if (visitors) {
-      visitors.inlineComment = (node: Node): string => {
-        return (options.visitor || visitor)(node, env);
-      };
-    }
+    Compiler.prototype.visitors.inlineComment = visitor;
   }
 
   return transformer;
 
-  function transformer(tree: Node, file: VFile, next: NextFunction) {
-    tree.children.reverse().forEach((node: Node, i: number) => {
+  function transformer(tree: ASTNode, file: any, next: NextFunction) {
+    tree.children.reverse().forEach((node: ASTNode, i: number) => {
       if (node.children.length >= 1) {
         return;
       }
@@ -48,7 +50,7 @@ export default function attacher(options: Options = {}) {
     next(null, tree, file);
   }
 
-  function inlineTokenizer(eat, value: string) {
+  function inlineTokenizer(eat: any, value: string) {
     const match = commentRegExp.exec(value);
     if (!match) {
       return null;
@@ -88,7 +90,7 @@ function locator(value: string, fromIndex: number) {
   return value.indexOf('#[', fromIndex);
 }
 
-function visitor(node: Node, env: string) {
+function visitor(node: ASTNode, env: string) {
   if (env === 'production') {
     return '';
   }
