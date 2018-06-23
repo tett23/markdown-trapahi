@@ -21,4 +21,11 @@ describe('optionParser', () => {
   it('parse string option', () => {
     expect(optionParser('opt=foo').opt).toBe('foo');
   });
+
+  it('parse multiple option', () => {
+    const options = optionParser('opt1 opt2=true');
+
+    expect(options.opt1).toBe(true);
+    expect(options.opt2).toBe(true);
+  });
 });
