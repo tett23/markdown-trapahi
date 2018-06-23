@@ -1,8 +1,8 @@
+type OptionValue = string | number | boolean | null;
 interface RubyOptions {
-  [key: string]: string | number | boolean;
+  [key: string]: OptionValue
 }
 
-type OptionValue = string | number | boolean;
 
 export default function optionParser(optionText: string): RubyOptions {
   return splitValues(optionText).reduce((acc: RubyOptions, [key, value]) => {
