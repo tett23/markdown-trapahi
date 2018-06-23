@@ -32,12 +32,7 @@ export default function attacher(_options: PartialOptions) {
   inlineTokenizer.locator = locator;
 
   if (Compiler != null) {
-    const { visitors } = Compiler.prototype;
-    if (visitors) {
-      visitors.inlineComment = (node: Node): string => {
-        return (options.visitor || visitor)(node, options.env);
-      };
-    }
+    Compiler.prototype.visitors.ruby = options.visitor;
   }
 
   function inlineTokenizer(eat: any, value: string): any {
@@ -59,6 +54,8 @@ export default function attacher(_options: PartialOptions) {
     return eat(matchText)({
       type: 'ruby',
       data: {
+        baseText: baseText,
+        rubyText: rubyText,
         hName: 'ruby',
         hProperties: {
           className: options.className,
@@ -115,10 +112,6 @@ function locator(value: string, fromIndex: number): number {
   return match.index;
 }
 
-function visitor(node: Node, env: string): string {
-  if (env === 'production') {
-    return '';
-  }
-
-  return `[${node.children[0].value}]`;
+function visitor(node: Node): string {
+  return `[${node.data.baseText}](${node.data.rubyText}){ruby}`;
 }
